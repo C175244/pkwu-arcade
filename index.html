@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PKWU ARCADE — Bayu Alfatir</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d0221; --pink:#ff2e88; --cyan:#00fff5; --yellow:#ffe600;
+  --purple:#9d4edd; --green:#39ff14; --orange:#ff8c00; --dark:#1a0b2e;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  background:var(--bg); color:#fff; overflow-x:hidden;
+  font-family:'VT323', monospace; font-size:22px; cursor:none;
+  background-image:radial-gradient(circle at 15% 20%, rgba(255,46,136,.12), transparent 40%),
+                   radial-gradient(circle at 85% 80%, rgba(57,255,20,.08), transparent 40%);
+}
+.scanlines{
+  position:fixed; inset:0; pointer-events:none; z-index:9990;
+  background:repeating-linear-gradient(0deg, rgba(0,0,0,.18) 0 2px, transparent 2px 4px);
+  animation:flicker 4s infinite;
+}
+@keyframes flicker{0%,100%{opacity:1}92%{opacity:1}93%{opacity:.7}94%{opacity:1}}
+.star{position:fixed; width:4px; height:4px; background:#fff; z-index:0; animation:blink 1.5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.1}}
+/* ===== KURSOR ===== */
+#cursor{
+  position:fixed; width:16px; height:16px; z-index:9999; pointer-events:none;
+  background:var(--yellow); transform:translate(-50%,-50%) rotate(45deg);
+  box-shadow:0 0 10px var(--yellow),0 0 20px var(--yellow); transition:width .15s,height .15s,background .15s;
+}
+#cursor.big{width:28px;height:28px;background:var(--green);box-shadow:0 0 12px var(--green),0 0 26px var(--green)}
+.trail{position:fixed; width:6px; height:6px; z-index:9998; pointer-events:none; animation:fadeTrail .5s forwards}
+@keyframes fadeTrail{from{opacity:1;transform:scale(1)}to{opacity:0;transform:scale(.2)}}
+.spark{position:fixed; width:8px; height:8px; z-index:9998; pointer-events:none; animation:boom .6s forwards}
+@keyframes boom{from{opacity:1;transform:translate(0,0) scale(1)}to{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.3)}}
+/* ===== HUD ===== */
+.hud{
+  display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;
+  padding:14px 20px; font-family:'Press Start 2P'; font-size:10px;
+  color:var(--yellow); text-shadow:2px 2px 0 #b58900;
+}
+.hud .logo{color:var(--cyan); text-shadow:2px 2px 0 #003d3a; animation:neonPulse 2s infinite}
+@keyframes neonPulse{0%,100%{text-shadow:2px 2px 0 #003d3a,0 0 10px var(--cyan)}50%{text-shadow:2px 2px 0 #003d3a,0 0 25px var(--cyan)}}
+/* ===== TOMBOL ARCADE ===== */
+.btn{
+  display:inline-block; font-family:'Press Start 2P'; font-size:12px;
+  color:#000; background:var(--yellow); border:3px solid #000;
+  padding:12px 20px; text-decoration:none; box-shadow:0 6px 0 #b58900;
+  transition:transform .1s, box-shadow .1s, filter .2s; cursor:none; user-select:none;
+}
+.btn:hover{filter:brightness(1.2); transform:scale(1.06)}
+.btn:active{transform:translateY(5px); box-shadow:0 1px 0 #b58900}
+.btn.pink{background:var(--pink); color:#fff; box-shadow:0 6px 0 #8f0040}
+.btn.pink:active{box-shadow:0 1px 0 #8f0040}
+.btn.cyan{background:var(--cyan); box-shadow:0 6px 0 #00807a}
+.btn.cyan:active{box-shadow:0 1px 0 #00807a}
+/* ===== HERO ===== */
+.hero{min-height:75vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:40px 20px; position:relative; z-index:1}
+.coin{font-family:'Press Start 2P'; font-size:12px; color:var(--yellow); animation:blink 1s infinite; margin-bottom:30px}
+h1{font-family:'Press Start 2P'; font-size:clamp(22px,5.5vw,48px); line-height:1.5; margin:14px 0;
+   color:var(--pink); text-shadow:3px 3px 0 #660033, 0 0 30px var(--pink)}
+h1 .c{color:var(--cyan); text-shadow:3px 3px 0 #003d3a, 0 0 30px var(--cyan)}
+.tagline{font-size:26px; color:#cfc3ff; margin:16px 0 34px; max-width:640px}
+.hi{font-family:'Press Start 2P'; font-size:13px; color:var(--green); text-shadow:2px 2px 0 #0a3d00}
+/* ===== SECTION ===== */
+section{padding:70px 20px; max-width:1000px; margin:0 auto; position:relative; z-index:1}
+h2{font-family:'Press Start 2P'; font-size:clamp(15px,3.4vw,24px); text-align:center; color:var(--yellow);
+   text-shadow:3px 3px 0 #7a5c00, 0 0 20px var(--yellow); margin-bottom:50px}
+/* ===== KARTU PROYEK ===== */
+.grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:26px}
+.card{
+  background:var(--dark); border:4px solid var(--orange); padding:26px; text-align:center;
+  text-decoration:none; color:#fff; display:block; position:relative;
+  transition:transform .2s, border-color .2s, box-shadow .2s; cursor:none;
+}
+.card:hover{
+  transform:scale(1.05) rotate(1deg); border-color:var(--green);
+  box-shadow:0 0 25px var(--green), inset 0 0 15px rgba(57,255,20,.15);
+}
+.card:hover .card-title{color:var(--green)}
+.card-icon{font-size:52px; margin-bottom:16px; display:block; animation:bob 2s infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.card-title{font-family:'Press Start 2P'; font-size:13px; color:var(--orange); line-height:1.6; margin-bottom:14px; transition:color .2s}
+.card-desc{font-size:21px; color:#b8a8e8; line-height:1.35}
+.card-tag{display:inline-block; font-family:'Press Start 2P'; font-size:9px; background:var(--green); color:#000; padding:6px 10px; margin-top:16px}
+.card.soon{border-style:dashed; opacity:.75; border-color:var(--purple)}
+.card.soon .card-tag{background:#666; color:#ddd}
+.select-hint{font-family:'Press Start 2P'; font-size:9px; color:var(--green); margin-top:12px; opacity:0; transition:opacity .2s}
+.card:hover .select-hint{opacity:1; animation:blink .7s infinite}
+/* ===== KONTAK ===== */
+.contact-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:22px}
+.contact-card{
+  background:var(--dark); border:4px solid; padding:24px; text-align:center;
+  text-decoration:none; color:#fff; transition:transform .2s, box-shadow .2s; display:block; cursor:none;
+}
+.contact-card:hover{transform:scale(1.07)}
+.contact-card .icon{font-size:44px; display:block; margin-bottom:12px}
+.contact-card .platform{font-family:'Press Start 2P'; font-size:10px; margin-bottom:10px}
+.contact-card .handle{font-size:21px; color:#cfc3ff; word-break:break-all}
+.c-ig{border-color:var(--pink)} .c-ig:hover{box-shadow:0 0 25px var(--pink)} .c-ig .platform{color:var(--pink)}
+.c-gh{border-color:#fff} .c-gh:hover{box-shadow:0 0 25px #fff}
+.c-li{border-color:#0a86ff} .c-li:hover{box-shadow:0 0 25px #0a86ff} .c-li .platform{color:#0a86ff}
+.c-em{border-color:var(--yellow)} .c-em:hover{box-shadow:0 0 25px var(--yellow)} .c-em .platform{color:var(--yellow)}
+footer{text-align:center; padding:40px 20px; font-family:'Press Start 2P'; font-size:9px; color:#7a6bb0; line-height:2}
+@media (hover:none){
+  body,.btn,.card,.contact-card{cursor:auto}
+  #cursor{display:none}
+}
+</style>
+</head>
+<body>
+<div class="scanlines"></div>
+<div id="cursor"></div>
+
+<!-- HUD ATAS -->
+<nav class="hud">
+  <span class="logo">PKWU ARCADE</span>
+  <span>LEVEL PKWU ♥♥♥</span>
+  <div style="display:flex;gap:10px">
+    <a class="btn cyan" href="https://c175244.github.io/Portofolio-Bayu/" style="font-size:9px;padding:9px 12px" data-t="back">◀ PORTOFOLIO</a>
+    <button class="btn pink" id="langBtn" style="font-size:9px;padding:9px 12px">EN</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <p class="coin" data-t="coin">▲ MASUKKAN KOIN ▲</p>
+  <p class="hi" data-t="hi">SELAMAT DATANG DI DUNIA</p>
+  <h1>PKWU<br><span class="c">ARCADE</span></h1>
+  <p class="tagline" data-t="tagline">Ini dia kumpulan proyek Kewirausahaan (PKWU) saya. Pilih salah satu mesin arcade di bawah untuk membuka website proyeknya!</p>
+  <a href="#proyek" class="btn" data-t="start">▶ PILIH PROYEK</a>
+</header>
+
+<!-- PROYEK PKWU -->
+<section id="proyek">
+  <h2 data-t="projects">★ MESIN PROYEK PKWU ★</h2>
+  <div class="grid">
+    <a class="card" href="https://c175244.github.io/budidaya-gurame-pkwu/#beranda" target="_blank">
+      <span class="card-icon">🐟</span>
+      <div class="card-title" data-t="p1t">BUDIDAYA GURAME</div>
+      <p class="card-desc" data-t="p1d">Website proyek budidaya ikan gurame — lengkap dengan panduan dan info usahanya.</p>
+      <span class="card-tag" data-t="play">BUKA WEBSITE</span>
+      <div class="select-hint" data-t="select">▶ PILIH ◀</div>
+    </a>
+    <div class="card soon">
+      <span class="card-icon">🎰</span>
+      <div class="card-title" data-t="p2t">PROYEK PKWU 2</div>
+      <p class="card-desc" data-t="p2d">Mesin ini masih diservis. Proyek berikutnya segera dipasang!</p>
+      <span class="card-tag" data-t="soon">SEGERA HADIR</span>
+    </div>
+    <div class="card soon">
+      <span class="card-icon">🕹️</span>
+      <div class="card-title" data-t="p3t">PROYEK PKWU 3</div>
+      <p class="card-desc" data-t="p3d">Slot kosong menunggu proyek keren berikutnya. Stay tuned!</p>
+      <span class="card-tag" data-t="soon2">SEGERA HADIR</span>
+    </div>
+  </div>
+</section>
+
+<!-- KONTAK -->
+<section id="kontak">
+  <h2 data-t="contact">★ HUBUNGI PLAYER ★</h2>
+  <div class="contact-grid">
+    <a class="contact-card c-ig" href="https://www.instagram.com/bsfuib?igsh=cHZzYnF4ejA5ZXBz" target="_blank">
+      <span class="icon">📸</span>
+      <div class="platform">INSTAGRAM</div>
+      <div class="handle">bsfuib</div>
+    </a>
+    <a class="contact-card c-gh" href="https://github.com/C175244" target="_blank">
+      <span class="icon">🐙</span>
+      <div class="platform">GITHUB</div>
+      <div class="handle">bayualfatir</div>
+    </a>
+    <a class="contact-card c-li" href="https://www.linkedin.com/in/bayu-alfatir-292963327?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank">
+      <span class="icon">💼</span>
+      <div class="platform">LINKEDIN</div>
+      <div class="handle">bayualfatir</div>
+    </a>
+    <a class="contact-card c-em" href="mailto:bayualfatir89@gmail.com">
+      <span class="icon">✉️</span>
+      <div class="platform">EMAIL</div>
+      <div class="handle">bayualfatir89@gmail.com</div>
+    </a>
+  </div>
+</section>
+
+<footer>
+  <p data-t="footer">© 2026 BAYU ALFATIR — PKWU ARCADE</p>
+  <p data-t="footer2">HIGH SCORE TERCAPAI. LANJUTKAN, PLAYER!</p>
+</footer>
+
+<script>
+/* ===== DWIBAHASA ===== */
+const T = {
+  id:{
+    back:"◀ PORTOFOLIO", coin:"▲ MASUKKAN KOIN ▲", hi:"SELAMAT DATANG DI DUNIA",
+    tagline:"Ini dia kumpulan proyek Kewirausahaan (PKWU) saya. Pilih salah satu mesin arcade di bawah untuk membuka website proyeknya!",
+    start:"▶ PILIH PROYEK", projects:"★ MESIN PROYEK PKWU ★",
+    p1t:"BUDIDAYA GURAME", p1d:"Website proyek budidaya ikan gurame — lengkap dengan panduan dan info usahanya.",
+    play:"BUKA WEBSITE", select:"▶ PILIH ◀",
+    p2t:"PROYEK PKWU 2", p2d:"Mesin ini masih diservis. Proyek berikutnya segera dipasang!",
+    p3t:"PROYEK PKWU 3", p3d:"Slot kosong menunggu proyek keren berikutnya. Stay tuned!",
+    soon:"SEGERA HADIR", soon2:"SEGERA HADIR",
+    contact:"★ HUBUNGI PLAYER ★",
+    footer:"© 2026 BAYU ALFATIR — PKWU ARCADE", footer2:"HIGH SCORE TERCAPAI. LANJUTKAN, PLAYER!"
+  },
+  en:{
+    back:"◀ PORTFOLIO", coin:"▲ INSERT COIN ▲", hi:"WELCOME TO THE WORLD OF",
+    tagline:"Here's my collection of Entrepreneurship (PKWU) projects. Pick one of the arcade machines below to open its website!",
+    start:"▶ CHOOSE PROJECT", projects:"★ PKWU PROJECT MACHINES ★",
+    p1t:"GOURAMI FARMING", p1d:"A gourami fish farming project website — complete with guides and business info.",
+    play:"OPEN WEBSITE", select:"▶ SELECT ◀",
+    p2t:"PKWU PROJECT 2", p2d:"This machine is under maintenance. Next project coming soon!",
+    p3t:"PKWU PROJECT 3", p3d:"An empty slot waiting for the next cool project. Stay tuned!",
+    soon:"COMING SOON", soon2:"COMING SOON",
+    contact:"★ CONTACT PLAYER ★",
+    footer:"© 2026 BAYU ALFATIR — PKWU ARCADE", footer2:"HIGH SCORE ACHIEVED. KEEP GOING, PLAYER!"
+  }
+};
+let lang = 'id';
+const langBtn = document.getElementById('langBtn');
+langBtn.addEventListener('click', () => {
+  lang = (lang === 'id') ? 'en' : 'id';
+  langBtn.textContent = (lang === 'id') ? 'EN' : 'ID';
+  document.querySelectorAll('[data-t]').forEach(el => { el.textContent = T[lang][el.dataset.t]; });
+  beep(660); setTimeout(()=>beep(990), 90);
+});
+
+/* ===== KURSOR CUSTOM + JEJAK + LEDAKAN ===== */
+const cursorEl = document.getElementById('cursor');
+const fine = window.matchMedia('(hover:hover)').matches;
+const colors = ['#ff2e88','#00fff5','#ffe600','#39ff14','#ff8c00'];
+if (fine) {
+  let last = 0;
+  document.addEventListener('mousemove', e => {
+    cursorEl.style.left = e.clientX + 'px';
+    cursorEl.style.top  = e.clientY + 'px';
+    const now = Date.now();
+    if (now - last > 40) { last = now; trail(e.clientX, e.clientY); }
+  });
+  document.addEventListener('mouseover', e => {
+    cursorEl.classList.toggle('big', !!e.target.closest('a,button,.card'));
+  });
+}
+function trail(x, y) {
+  const t = document.createElement('div');
+  t.className = 'trail';
+  t.style.left = (x + (Math.random()*16-8)) + 'px';
+  t.style.top  = (y + (Math.random()*16-8)) + 'px';
+  t.style.background = colors[Math.floor(Math.random()*colors.length)];
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 500);
+}
+document.addEventListener('click', e => {
+  for (let i = 0; i < 12; i++) {
+    const s = document.createElement('div');
+    s.className = 'spark';
+    const a = (Math.PI*2*i)/12, d = 50 + Math.random()*40;
+    s.style.setProperty('--dx', Math.cos(a)*d + 'px');
+    s.style.setProperty('--dy', Math.sin(a)*d + 'px');
+    s.style.left = e.clientX + 'px';
+    s.style.top  = e.clientY + 'px';
+    s.style.background = colors[i % colors.length];
+    document.body.appendChild(s);
+    setTimeout(()=>s.remove(), 600);
+  }
+});
+
+/* ===== SUARA ARCADE ===== */
+let AC;
+function beep(f, d=0.09) {
+  try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    const o = AC.createOscillator(), g = AC.createGain();
+    o.type = 'square'; o.frequency.value = f;
+    g.gain.setValueAtTime(0.04, AC.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, AC.currentTime + d);
+    o.connect(g); g.connect(AC.destination);
+    o.start(); o.stop(AC.currentTime + d);
+  } catch(e) {}
+}
+document.querySelectorAll('.card, .btn, .contact-card').forEach(el => {
+  el.addEventListener('mouseenter', () => beep(440, 0.05));
+  el.addEventListener('click', () => { beep(988, 0.08); setTimeout(()=>beep(1319, 0.12), 80); });
+});
+
+/* ===== BINTANG LATAR ===== */
+for (let i = 0; i < 60; i++) {
+  const s = document.createElement('div');
+  s.className = 'star';
+  s.style.left = Math.random()*100 + 'vw';
+  s.style.top  = Math.random()*100 + 'vh';
+  s.style.animationDelay = Math.random()*2 + 's';
+  document.body.appendChild(s);
+}
+</script>
+</body>
+</html>
+
