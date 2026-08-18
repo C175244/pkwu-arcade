@@ -69,6 +69,16 @@ h1 .c{color:var(--cyan); text-shadow:3px 3px 0 #003d3a, 0 0 30px var(--cyan)}
 section{padding:70px 20px; max-width:1000px; margin:0 auto; position:relative; z-index:1}
 h2{font-family:'Press Start 2P'; font-size:clamp(15px,3.4vw,24px); text-align:center; color:var(--yellow);
    text-shadow:3px 3px 0 #7a5c00, 0 0 20px var(--yellow); margin-bottom:50px}
+/* ===== INFO BOX PKWU ===== */
+.info-box{
+  background:rgba(26, 11, 46, 0.8); border:4px solid var(--cyan); padding:30px; text-align:left;
+  box-shadow:0 0 20px rgba(0, 255, 245, 0.15), inset 0 0 15px rgba(0, 255, 245, 0.05);
+}
+.info-box p{font-size:22px; color:#cfc3ff; line-height:1.5;}
+.pkwu-list{list-style:none; margin:24px 0; font-size:21px; color:#fff;}
+.pkwu-list li{margin-bottom:20px; position:relative; padding-left:34px;}
+.pkwu-list li::before{content:'▶'; position:absolute; left:0; top:2px; color:var(--pink); font-size:16px; animation:blink 2s infinite;}
+.pkwu-list strong{font-family:'Press Start 2P'; font-size:11px; color:var(--yellow); display:block; margin-bottom:8px; line-height:1.5; letter-spacing:1px;}
 /* ===== KARTU PROYEK ===== */
 .grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:26px}
 .card{
@@ -130,9 +140,28 @@ footer{text-align:center; padding:40px 20px; font-family:'Press Start 2P'; font-
   <p class="coin" data-t="coin">▲ MASUKKAN KOIN ▲</p>
   <p class="hi" data-t="hi">SELAMAT DATANG DI DUNIA</p>
   <h1>PKWU<br><span class="c">ARCADE</span></h1>
-  <p class="tagline" data-t="tagline">Ini dia kumpulan proyek Kewirausahaan (PKWU) saya. Pilih salah satu mesin arcade di bawah untuk membuka website proyeknya!</p>
-  <a href="#proyek" class="btn" data-t="start">▶ PILIH PROYEK</a>
+  <p class="tagline" data-t="tagline">Ini dia kumpulan proyek Kewirausahaan (PKWU) Bayu Alfatir. Pilih salah satu mesin arcade di bawah untuk membuka website proyeknya!</p>
+  <a href="#tentang-pkwu" class="btn" data-t="start">▶ START GAME</a>
 </header>
+
+<!-- TENTANG PKWU -->
+<section id="tentang-pkwu" style="padding-top:20px; padding-bottom:30px;">
+  <h2 data-t="aboutTitle">★ APA ITU PKWU? ★</h2>
+  <div class="info-box">
+    <p data-t="pkwuDesc1">PKWU adalah singkatan dari <b>Prakarya dan Kewirausahaan</b>, mata pelajaran yang seru untuk melatih kreativitas dan inovasi kita dalam menciptakan sesuatu.</p>
+    <ul class="pkwu-list">
+      <li>
+        <strong data-t="pkwuP">PRAKARYA:</strong>
+        <span data-t="pkwuP_desc">Berasal dari kata "Pra" (sebelum) dan "Karya" (hasil kerja). Artinya, membuat karya awal, purwarupa (prototype), atau produk mentah sebelum diproduksi secara massal.</span>
+      </li>
+      <li>
+        <strong data-t="pkwuKW">KEWIRAUSAHAAN:</strong>
+        <span data-t="pkwuKW_desc">Semangat, sikap, dan kemampuan seseorang untuk menciptakan nilai tambah dari sebuah produk agar bisa menjadi usaha atau bisnis yang nyata.</span>
+      </li>
+    </ul>
+    <p style="color:#b8a8e8; margin-top:20px; text-align:center;" data-t="pkwuDesc2">Melalui proyek arcade di bawah ini, Bayu Alfatir berlatih merancang ide dan membangun jiwa bisnis dari level satu!</p>
+  </div>
+</section>
 
 <!-- PROYEK PKWU -->
 <section id="proyek">
@@ -197,8 +226,16 @@ footer{text-align:center; padding:40px 20px; font-family:'Press Start 2P'; font-
 const T = {
   id:{
     back:"◀ PORTOFOLIO", coin:"▲ MASUKKAN KOIN ▲", hi:"SELAMAT DATANG DI DUNIA",
-    tagline:"Ini dia kumpulan proyek Kewirausahaan (PKWU) saya. Pilih salah satu mesin arcade di bawah untuk membuka website proyeknya!",
-    start:"▶ PILIH PROYEK", projects:"★ MESIN PROYEK PKWU ★",
+    tagline:"Ini dia kumpulan proyek Kewirausahaan (PKWU) Bayu Alfatir. Pilih salah satu mesin arcade di bawah untuk membuka website proyeknya!",
+    start:"▶ START GAME", 
+    aboutTitle:"★ APA ITU PKWU? ★",
+    pkwuDesc1:"PKWU adalah singkatan dari Prakarya dan Kewirausahaan, mata pelajaran yang seru untuk melatih kreativitas dan inovasi kita dalam menciptakan sesuatu.",
+    pkwuP:"PRAKARYA:",
+    pkwuP_desc:"Berasal dari kata \"Pra\" (sebelum) dan \"Karya\" (hasil kerja). Artinya, membuat karya awal, purwarupa (prototype), atau produk mentah sebelum diproduksi secara massal.",
+    pkwuKW:"KEWIRAUSAHAAN:",
+    pkwuKW_desc:"Semangat, sikap, dan kemampuan seseorang untuk menciptakan nilai tambah dari sebuah produk agar bisa menjadi usaha atau bisnis yang nyata.",
+    pkwuDesc2:"Melalui proyek arcade di bawah ini, Bayu Alfatir berlatih merancang ide dan membangun jiwa bisnis dari level satu!",
+    projects:"★ MESIN PROYEK PKWU ★",
     p1t:"BUDIDAYA GURAME", p1d:"Website proyek budidaya ikan gurame — lengkap dengan panduan dan info usahanya.",
     play:"BUKA WEBSITE", select:"▶ PILIH ◀",
     p2t:"PROYEK PKWU 2", p2d:"Mesin ini masih diservis. Proyek berikutnya segera dipasang!",
@@ -209,8 +246,16 @@ const T = {
   },
   en:{
     back:"◀ PORTFOLIO", coin:"▲ INSERT COIN ▲", hi:"WELCOME TO THE WORLD OF",
-    tagline:"Here's my collection of Entrepreneurship (PKWU) projects. Pick one of the arcade machines below to open its website!",
-    start:"▶ CHOOSE PROJECT", projects:"★ PKWU PROJECT MACHINES ★",
+    tagline:"Here is Bayu Alfatir's collection of Entrepreneurship (PKWU) projects. Pick one of the arcade machines below to open its website!",
+    start:"▶ START GAME", 
+    aboutTitle:"★ WHAT IS PKWU? ★",
+    pkwuDesc1:"PKWU stands for Prakarya dan Kewirausahaan (Crafts and Entrepreneurship), a fun subject that trains our creativity and innovation.",
+    pkwuP:"PRAKARYA (CRAFTS):",
+    pkwuP_desc:"Derived from 'Pra' (before) and 'Karya' (work). It means creating preliminary work, a prototype, or raw products before mass production.",
+    pkwuKW:"KEWIRAUSAHAAN (ENTREPRENEURSHIP):",
+    pkwuKW_desc:"The spirit, attitude, and ability of a person to create added value from a product so it can become a real business or venture.",
+    pkwuDesc2:"Through the arcade projects below, Bayu Alfatir practices designing ideas and building a business mindset from level one!",
+    projects:"★ PKWU PROJECT MACHINES ★",
     p1t:"GOURAMI FARMING", p1d:"A gourami fish farming project website — complete with guides and business info.",
     play:"OPEN WEBSITE", select:"▶ SELECT ◀",
     p2t:"PKWU PROJECT 2", p2d:"This machine is under maintenance. Next project coming soon!",
@@ -225,7 +270,10 @@ const langBtn = document.getElementById('langBtn');
 langBtn.addEventListener('click', () => {
   lang = (lang === 'id') ? 'en' : 'id';
   langBtn.textContent = (lang === 'id') ? 'EN' : 'ID';
-  document.querySelectorAll('[data-t]').forEach(el => { el.textContent = T[lang][el.dataset.t]; });
+  document.querySelectorAll('[data-t]').forEach(el => { 
+    // Menggunakan innerHTML agar tag <b> tetap bisa di-render (terutama di pkwuDesc1)
+    el.innerHTML = T[lang][el.dataset.t]; 
+  });
   beep(660); setTimeout(()=>beep(990), 90);
 });
 
@@ -299,4 +347,3 @@ for (let i = 0; i < 60; i++) {
 </script>
 </body>
 </html>
-
