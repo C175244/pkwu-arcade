@@ -123,7 +123,7 @@ h2{font-family:'Press Start 2P'; font-size:clamp(15px,3.4vw,24px); text-align:ce
 }
 #gameOverlay.open{display:flex}
 #gc{
-  image-rendering:pixelated; touch-action:none; width:100%;
+  image-rendering:pixelated; touch-action:none;
   border-top:4px solid var(--cyan); border-bottom:4px solid var(--cyan);
   box-shadow:0 0 25px rgba(0,255,245,.25); background:rgba(26,11,46,.6);
 }
@@ -260,10 +260,13 @@ footer{text-align:center; padding:40px 20px; font-family:'Press Start 2P'; font-
   </div>
   <div class="gmsg" id="msgOver" style="display:none">
     <div class="gtitle" style="color:var(--pink); text-shadow:4px 4px 0 #660033, 0 0 35px var(--pink)" data-t="gameOver">GAME OVER</div>
-    <p class="gmock" data-t="gameOverMock">HAHA! BARU SEGITU? COBA LAGI, PLAYER! 😜</p>
+    <p class="gmock" data-t="gameOverMock">HAHA! BARU SEGITU? COBA LAGI! 😜</p>
     <p class="ghint" id="finalScore"></p>
     <p class="newhi" id="newHi" style="display:none" data-t="newHi">★ REKOR BARU! ★</p>
-    <button class="btn" id="retryBtn" data-t="gameRetry">↻ COBA LAGI</button>
+    <div style="display:flex; gap:16px; flex-wrap:wrap; justify-content:center">
+      <button class="btn" id="retryBtn" data-t="gameRetry">↻ COBA LAGI</button>
+      <button class="btn pink" id="menuBtn" data-t="gameMenu">◀ MENU</button>
+    </div>
   </div>
   <div id="countText"></div>
   <button id="duckBtn">▼</button>
@@ -326,8 +329,8 @@ const T = {
     gameDesc:"Dino Runner! Lompati rintangan, tunduk dari musuh terbang, dan kumpulkan koin. Makin lama makin cepat — kuat sampai mana kamu?",
     gameBtn:"▶ MAIN SEKARANG", gameBack:"◀ KEMBALI",
     gameStart:"▶ START", gameHint:"SPASI / TAP = LONCAT &nbsp;·&nbsp; TAHAN ▼ = NUNGGING",
-    gameOver:"GAME OVER", gameOverMock:"HAHA! BARU SEGITU? COBA LAGI, PLAYER! 😜",
-    gameRetry:"↻ COBA LAGI", newHi:"★ REKOR BARU! ★", hiScore:"HI-SCORE: ",
+    gameOver:"GAME OVER", gameOverMock:"HAHA! BARU SEGITU? COBA LAGI! 😜",
+    gameRetry:"↻ COBA LAGI", gameMenu:"◀ MENU", newHi:"★ REKOR BARU! ★", hiScore:"HI-SCORE: ",
     footer:"© 2026 BAYU ALFATIR — PKWU ARCADE", footer2:"HIGH SCORE TERCAPAI. LANJUTKAN, PLAYER!"
   },
   en:{
@@ -352,8 +355,8 @@ const T = {
     gameDesc:"Dino Runner! Jump over obstacles, duck under flying enemies, and collect coins. It gets faster the longer you survive — how far can you go?",
     gameBtn:"▶ PLAY NOW", gameBack:"◀ BACK",
     gameStart:"▶ START", gameHint:"SPACE / TAP = JUMP &nbsp;·&nbsp; HOLD ▼ = DUCK",
-    gameOver:"GAME OVER", gameOverMock:"LOL! IS THAT ALL? TRY AGAIN, PLAYER! 😜",
-    gameRetry:"↻ TRY AGAIN", newHi:"★ NEW HIGH SCORE! ★", hiScore:"HI-SCORE: ",
+    gameOver:"GAME OVER", gameOverMock:"LOL! IS THAT ALL? TRY AGAIN! 😜",
+    gameRetry:"↻ TRY AGAIN", gameMenu:"◀ MENU", newHi:"★ NEW HIGH SCORE! ★", hiScore:"HI-SCORE: ",
     footer:"© 2026 BAYU ALFATIR — PKWU ARCADE", footer2:"HIGH SCORE ACHIEVED. KEEP GOING, PLAYER!"
   }
 };
@@ -440,7 +443,10 @@ document.querySelectorAll('.card, .btn, .contact-card').forEach(el => {
   const LW=900, LH=240, GROUND=200; // ukuran logis kanvas
   function resize(){
     cv.width=LW; cv.height=LH;
-    cv.style.height=Math.min(window.innerHeight*0.55, 320)+'px';
+    // pertahankan rasio aspek 900:240 biar dino & rintangan tidak gepeng/kepanjangan
+    const scale=Math.min(window.innerWidth/LW, (window.innerHeight*0.6)/LH);
+    cv.style.width=(LW*scale)+'px';
+    cv.style.height=(LH*scale)+'px';
   }
   window.addEventListener('resize', resize); resize();
 
@@ -575,17 +581,37 @@ document.querySelectorAll('.card, .btn, .contact-card').forEach(el => {
     }
   };
 
-  // --- backsound chiptune, tempo ngikutin speed ---
+  // --- backsound chiptune: loop 64 langkah, progresi akor + variasi tiap bagian ---
   let bgmOn=false, bgmStep=0, bgmTimer=null;
-  const BASS=[110,110,131,110,165,147,131,98];
-  const LEAD=[440,0,523,0,659,587,523,440, 440,0,523,0,784,659,587,523];
+  // progresi akor 8 bar (A minor feel): Am, Am, F, F, C, C, G, G
+  const CHORDS=[[220,262,330],[220,262,330],[175,220,262],[175,220,262],
+                [262,330,392],[262,330,392],[196,247,294],[196,247,294]];
+  // bassline per bar (2 nada per bar)
+  const BASSLINE=[110,110, 110,165, 87,87, 87,131, 131,131, 131,165, 98,98, 98,147];
+  // melodi 64 langkah (0 = istirahat), ada 2 frasa + variasi jawaban
+  const LEAD=[
+    // bagian A (bar 1-4)
+    440,0,523,440, 659,0,587,523, 440,0,523,440, 349,440,523,440,
+    523,0,659,523, 784,659,587,523, 587,0,659,587, 494,0,392,0,
+    // bagian B (bar 5-8) — jawaban dengan variasi oktaf
+    880,0,784,659, 523,0,587,659, 440,0,523,587, 659,784,659,523,
+    587,0,659,784, 880,784,659,587, 523,587,659,523, 440,0,0,0
+  ];
   function bgmTick(){
     if(!bgmOn) return;
-    const i=bgmStep%BASS.length;
-    tone(BASS[i],0.14,'triangle',0.028);
-    const l=LEAD[bgmStep%LEAD.length];
-    if(l) tone(l,0.12,'square',0.018);
-    if(bgmStep%4===0) tone(55,0.06,'square',0.035); // kick
+    const step=bgmStep%64;
+    const bar=Math.floor(step/8);
+    // bass: pola per bar
+    tone(BASSLINE[Math.floor(step/4)%16],0.13,'triangle',0.03);
+    // pad akor lembut tiap awal bar
+    if(step%8===0){ CHORDS[bar].forEach(f=>tone(f*0.5,0.5,'triangle',0.012)); }
+    // melodi utama
+    const l=LEAD[step];
+    if(l) tone(l,0.14,'square',0.016);
+    // drum: kick tiap ketukan, hi-hat off-beat, snare di ketukan 2 & 4
+    if(step%4===0) tone(55,0.06,'square',0.035);               // kick
+    if(step%2===1) tone(6000,0.03,'square',0.006);             // hi-hat
+    if(step%8===4) tone(190,0.07,'sawtooth',0.018,-60);        // snare
     bgmStep++;
     bgmTimer=setTimeout(bgmTick, 30000/(120+speed*9)); // makin cepat = makin kencang
   }
@@ -720,14 +746,16 @@ document.querySelectorAll('.card, .btn, .contact-card').forEach(el => {
     renderHi();
     beep(660); setTimeout(()=>beep(880),90); setTimeout(()=>beep(1100),180);
   });
-  document.getElementById('closeGameBtn').addEventListener('click', ()=>{
+  function closeGame(){
     running=false; bgmOn=false; clearTimeout(bgmTimer);
     ov.classList.remove('open');
     document.body.style.overflow='';
     duckBtn.classList.remove('on');
     try{ document.exitFullscreen && document.fullscreenElement && document.exitFullscreen(); }catch(e){}
     renderHi();
-  });
+  }
+  document.getElementById('closeGameBtn').addEventListener('click', closeGame);
+  document.getElementById('menuBtn').addEventListener('click', closeGame);
   document.getElementById('startBtn').addEventListener('click', startGame);
   document.getElementById('retryBtn').addEventListener('click', startGame);
 
